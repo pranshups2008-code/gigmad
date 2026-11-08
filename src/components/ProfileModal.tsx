@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { X, User, Briefcase, Globe, Send, Save, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, User, Briefcase, Globe, Save, Check } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
 import { SoundRadar } from '@/lib/audio';
 
@@ -9,7 +9,7 @@ interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   profile: UserProfile;
-  onSaveProfile: (updated: UserProfile) => void;
+  onSaveProfile: (updated: UserProfile) => Promise<void>;
 }
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({
@@ -21,36 +21,19 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [name, setName] = useState(profile.name);
   const [roleTitle, setRoleTitle] = useState(profile.roleTitle);
   const [portfolioUrl, setPortfolioUrl] = useState(profile.portfolioUrl);
-  const [telegramHandle, setTelegramHandle] = useState(profile.telegramHandle || '');
   const [isSaved, setIsSaved] = useState(false);
-
-  useEffect(() => {
-    setName(profile.name);
-    setRoleTitle(profile.roleTitle);
-    setPortfolioUrl(profile.portfolioUrl);
-    setTelegramHandle(profile.telegramHandle || '');
-  }, [profile]);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    SoundRadar.playSuccessChime();
-
-    const updated: UserProfile = {
-      ...profile,
-      name,
-      roleTitle,
-      portfolioUrl,
-      telegramHandle,
-    };
-
-    onSaveProfile(updated);
-    setIsSaved(true);
-    setTimeout(() => {
-      setIsSaved(false);
-      onClose();
-    }, 800);
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault(); setBusy(true); setError('');
+    try {
+      await onSaveProfile({ ...profile, name, roleTitle, portfolioUrl });
+      setIsSaved(true); SoundRadar.playSuccessChime(); onClose();
+    } catch (error) { setError(error instanceof Error ? error.message : 'Unable to save your profile.'); }
+    finally { setBusy(false); }
   };
 
   return (
@@ -75,6 +58,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
         {/* Form */}
         <form onSubmit={handleSave} className="space-y-4">
+          {error && <p role="alert" className="text-sm text-amber-300">{error}</p>}
           <div>
             <label className="block text-[11px] font-mono text-zinc-400 mb-1">Your Full Name</label>
             <div className="relative">
@@ -84,7 +68,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Alex Morgan"
+                placeholder="Your name"
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
               />
             </div>
@@ -120,22 +104,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </div>
           </div>
 
-          <div>
-            <label className="block text-[11px] font-mono text-zinc-400 mb-1">
-              Telegram Username (For Pro Webhook Alerts)
-            </label>
-            <div className="relative">
-              <Send className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={telegramHandle}
-                onChange={(e) => setTelegramHandle(e.target.value)}
-                placeholder="@yourhandle"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-          </div>
-
           <div className="pt-2 flex items-center justify-end gap-2">
             <button
               type="button"
@@ -146,6 +114,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </button>
             <button
               type="submit"
+              disabled={busy}
               className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5"
             >
               {isSaved ? (

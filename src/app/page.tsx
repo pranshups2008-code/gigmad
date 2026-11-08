@@ -5,15 +5,9 @@ import Link from 'next/link';
 import { 
   Radio, 
   Sparkles, 
-  Zap, 
   ArrowRight, 
   CheckCircle2, 
-  Send, 
-  DollarSign, 
-  ShieldCheck, 
   Globe2, 
-  TrendingUp, 
-  Users 
 } from 'lucide-react';
 import { PitchGraderSection } from '@/components/PitchGraderSection';
 
@@ -69,15 +63,15 @@ export default function LandingPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span>Real-Time Social Gig Radar for Freelancers Worldwide</span>
+            <span>Source-linked hiring posts for freelancers</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1]">
-            Catch <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">USD Client Gigs</span> Seconds After They Tweet
+            Catch <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">USD Client Gigs</span> From Real Hiring Posts
           </h1>
 
           <p className="text-base sm:text-xl text-zinc-300 max-w-2xl mx-auto leading-relaxed">
-            Startup founders post high-budget contracts on X, Reddit, and Discord daily. GigMad detects them instantly, drafts winning AI proposals, and lets you DM them first.
+            Browse hiring posts fetched from Reddit, open the original discussion, and draft an outreach message using your own profile. No invented clients or sample listings.
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -103,20 +97,20 @@ export default function LandingPage() {
           {/* Social Proof Stats */}
           <div className="pt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
             <div className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80">
-              <div className="text-2xl font-black text-white">$1.8M+</div>
-              <div className="text-xs text-zinc-400 font-mono mt-0.5">Gig Volume Tracked</div>
+              <div className="text-2xl font-black text-white">Reddit</div>
+              <div className="text-xs text-zinc-400 font-mono mt-0.5">Current source</div>
             </div>
             <div className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80">
-              <div className="text-2xl font-black text-emerald-400">&lt; 15s</div>
-              <div className="text-xs text-zinc-400 font-mono mt-0.5">Detection Speed</div>
+              <div className="text-2xl font-black text-emerald-400">1 minute</div>
+              <div className="text-xs text-zinc-400 font-mono mt-0.5">Dashboard refresh interval</div>
             </div>
             <div className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80">
               <div className="text-2xl font-black text-white">0%</div>
               <div className="text-xs text-zinc-400 font-mono mt-0.5">Commission Taken</div>
             </div>
             <div className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/80">
-              <div className="text-2xl font-black text-white">130+</div>
-              <div className="text-xs text-zinc-400 font-mono mt-0.5">Countries Active</div>
+              <div className="text-2xl font-black text-white">Source links</div>
+              <div className="text-xs text-zinc-400 font-mono mt-0.5">Open the original post</div>
             </div>
           </div>
 
@@ -132,7 +126,7 @@ export default function LandingPage() {
               Why Freelancers Are Ditching Traditional Job Boards
             </h2>
             <p className="text-xs sm:text-sm text-zinc-400">
-              Direct founder outreach beats competing against 200 applicants every single time.
+              Read the original request and decide whether the opportunity fits your work.
             </p>
           </div>
 
@@ -155,7 +149,7 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-red-400 font-bold shrink-0">✕</span>
-                  <span>200+ applicants per job within 15 minutes of posting</span>
+                  <span>Crowded applications can make it hard to stand out</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-red-400 font-bold shrink-0">✕</span>
@@ -178,7 +172,7 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>First in Inbox:</strong> DM founders on Twitter & Reddit 2 mins after posting</span>
+                  <span><strong>Original discussions:</strong> Read the post and contact the Reddit author</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />

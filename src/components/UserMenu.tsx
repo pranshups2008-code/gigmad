@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Settings, LogOut, Sparkles, ChevronDown, Shield } from 'lucide-react';
+import { Settings, LogOut, Sparkles, ChevronDown, Shield } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
 
 interface UserMenuProps {

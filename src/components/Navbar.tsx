@@ -2,14 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Radio, Volume2, VolumeX, Sparkles, ShieldCheck, Bookmark } from 'lucide-react';
+import { Radio, Volume2, VolumeX, Bookmark } from 'lucide-react';
 import { UserTier, UserProfile } from '@/lib/types';
 import { SoundRadar } from '@/lib/audio';
 import { UserMenu } from './UserMenu';
 
 interface NavbarProps {
   currentTier: UserTier;
-  onTierChange: (tier: UserTier) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
   savedCount: number;
@@ -22,7 +21,6 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentTier,
-  onTierChange,
   soundEnabled,
   onToggleSound,
   savedCount,
@@ -59,7 +57,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span>1,842 freelancers online</span>
+            <span>Reddit hiring posts</span>
           </div>
         </div>
 
@@ -116,41 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </Link>
 
-          {/* Interactive Tier Switcher / Demo Badge */}
-          <div className="hidden lg:flex items-center bg-zinc-900/90 border border-zinc-800 rounded-lg p-0.5">
-            <button
-              onClick={() => onTierChange('free')}
-              className={`px-2 py-1 text-xs rounded-md font-mono transition-all ${
-                currentTier === 'free'
-                  ? 'bg-zinc-800 text-white font-semibold shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-            >
-              Free
-            </button>
-            <button
-              onClick={() => onTierChange('trial')}
-              className={`px-2 py-1 text-xs rounded-md font-mono transition-all flex items-center gap-1 ${
-                currentTier === 'trial'
-                  ? 'bg-amber-500 text-zinc-950 font-bold shadow-sm'
-                  : 'text-amber-400 hover:text-amber-300'
-              }`}
-            >
-              <Sparkles className="w-3 h-3" />
-              <span>Trial</span>
-            </button>
-            <button
-              onClick={() => onTierChange('pro')}
-              className={`px-2 py-1 text-xs rounded-md font-mono transition-all flex items-center gap-1 ${
-                currentTier === 'pro'
-                  ? 'bg-emerald-500 text-zinc-950 font-bold shadow-sm'
-                  : 'text-emerald-400 hover:text-emerald-300'
-              }`}
-            >
-              <Sparkles className="w-3 h-3" />
-              Pro
-            </button>
-          </div>
+          <span className="hidden lg:inline text-xs capitalize text-zinc-400">{currentTier} plan</span>
 
           {/* User Account Login / Profile Dropdown */}
           {profile && onOpenAuth && onOpenProfile && onLogout && (

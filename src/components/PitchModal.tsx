@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Sparkles, Copy, Check, Send, AlertCircle } from 'lucide-react';
 import { Gig, PitchStyle, UserTier, UserProfile } from '@/lib/types';
 import { SoundRadar } from '@/lib/audio';
@@ -29,17 +29,20 @@ export const PitchModal: React.FC<PitchModalProps> = ({
   const [pitches, setPitches] = useState<PitchStyle[]>([]);
   const [activeTab, setActiveTab] = useState<'direct' | 'portfolio' | 'casual'>('direct');
   const [copied, setCopied] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const usedRef = useRef(onUsePitch);
+  useEffect(() => { usedRef.current = onUsePitch; }, [onUsePitch]);
+  const [error, setError] = useState('');
   const [editedContent, setEditedContent] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!gig || !isOpen) return;
 
-    setLoading(true);
-    setCopied(false);
+    const controller = new AbortController();
 
-    fetch('/api/pitch', {
+    fetch('/api/services/pitch', {
       method: 'POST',
+      signal: controller.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title: gig.title,
@@ -51,7 +54,7 @@ export const PitchModal: React.FC<PitchModalProps> = ({
         portfolioUrl: profile?.portfolioUrl,
       }),
     })
-      .then((res) => res.json())
+      .then(async (res) => { const data = await res.json(); if (!res.ok) throw new Error(data.error || 'Unable to generate a draft.'); return data; })
       .then((data) => {
         if (data.pitches) {
           setPitches(data.pitches);
@@ -60,20 +63,21 @@ export const PitchModal: React.FC<PitchModalProps> = ({
             initialMap[p.id] = p.content;
           });
           setEditedContent(initialMap);
-          onUsePitch();
+          Promise.resolve(usedRef.current()).catch(() => {});
         }
       })
-      .catch(() => {})
+      .catch((error) => setError(error instanceof Error ? error.message : 'Unable to generate a draft.'))
       .finally(() => setLoading(false));
-  }, [gig, isOpen]);
+    return () => controller.abort();
+  }, [gig, isOpen, profile?.name, profile?.portfolioUrl]);
 
   if (!isOpen || !gig) return null;
 
   const currentPitch = pitches.find((p) => p.id === activeTab);
   const contentToDisplay = editedContent[activeTab] || currentPitch?.content || '';
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(contentToDisplay);
+  const handleCopy = async () => {
+    try { await navigator.clipboard.writeText(contentToDisplay); } catch { setError('Unable to copy. Select the text and copy it manually.'); return; }
     setCopied(true);
     SoundRadar.playSuccessChime();
     setTimeout(() => setCopied(false), 2500);
@@ -118,7 +122,7 @@ export const PitchModal: React.FC<PitchModalProps> = ({
               onClick={onOpenUpgrade}
               className="underline font-semibold hover:text-white"
             >
-              Unlock Unlimited
+              View Pro
             </button>
           </div>
         )}
@@ -142,6 +146,7 @@ export const PitchModal: React.FC<PitchModalProps> = ({
 
         {/* Pitch Body & Editor */}
         <div className="p-5 flex-1 overflow-y-auto">
+          {error && <p role="alert" className="mb-3 text-sm text-amber-300">{error}</p>}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 space-y-3">
               <div className="w-7 h-7 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
@@ -175,7 +180,7 @@ export const PitchModal: React.FC<PitchModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopy}
-              disabled={loading}
+              disabled={loading || !contentToDisplay}
               className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
                 copied
                   ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
