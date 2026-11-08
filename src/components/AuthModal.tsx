@@ -90,7 +90,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
     }
   };
 
-  const handleOAuth = async (provider: 'google' | 'apple') => {
+  const handleOAuth = async (provider: 'google') => {
     setIsLoading(true);
     setErrorMessage(null);
 
@@ -104,7 +104,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
 
       if (error) throw error;
     } catch (err: any) {
-      setErrorMessage(err?.message || `Failed to sign in with ${provider}.`);
+      setErrorMessage(err?.message || `Failed to sign in with Google.`);
       setIsLoading(false);
     }
   };
@@ -175,25 +175,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
           </button>
         </div>
 
-        {/* Fast Social Auth */}
-        <div className="grid grid-cols-2 gap-3 mb-5">
+        {/* Fast Social Auth (Google 1-Click) */}
+        <div className="mb-5">
           <button
             type="button"
             onClick={() => handleOAuth('google')}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-900 hover:border-zinc-700 text-zinc-200 text-xs font-semibold transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-2xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-900 hover:border-zinc-700 text-zinc-100 text-xs sm:text-sm font-semibold transition-all disabled:opacity-50 shadow-sm"
           >
             <span className="font-black text-base leading-none">G</span>
-            <span>Google</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleOAuth('apple')}
-            disabled={isLoading}
-            className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-900 hover:border-zinc-700 text-zinc-200 text-xs font-semibold transition-all disabled:opacity-50"
-          >
-            <span className="text-base leading-none">🍎</span>
-            <span>Apple</span>
+            <span>Continue with Google</span>
           </button>
         </div>
 
