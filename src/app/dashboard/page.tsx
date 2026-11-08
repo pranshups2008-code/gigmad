@@ -97,6 +97,24 @@ export default function DashboardPage() {
     }
   }, []);
 
+  // Fetch real-time live posts from /api/gigs on mount
+  useEffect(() => {
+    const fetchGigs = async () => {
+      try {
+        const res = await fetch('/api/gigs');
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.gigs && data.gigs.length > 0) {
+            setGigs(data.gigs);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load live gigs:', err);
+      }
+    };
+    fetchGigs();
+  }, []);
+
   // Periodic simulated live drop: Drops a realistic fresh high-budget lead
   useEffect(() => {
     let incomingIndex = 0;
