@@ -9,6 +9,7 @@ interface RedditChild {
     selftext: string;
     author: string;
     url: string;
+    permalink: string;
     created_utc: number;
     link_flair_text?: string;
   };
@@ -65,12 +66,13 @@ function extractBudget(text: string): { budget: string; budgetNumeric: number } 
 async function fetchLiveRedditPosts(): Promise<Gig[]> {
   try {
     const res = await fetch(
-      'https://www.reddit.com/r/forhire/new.json?limit=15',
+      'https://www.reddit.com/r/forhire/new.json?limit=25',
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) GigMad/1.0',
+          'User-Agent': 'web:gigmad-platform:v1.0 (by /u/gigmad)',
+          'Accept': 'application/json',
         },
-        next: { revalidate: 60 },
+        cache: 'no-store',
       }
     );
 
@@ -96,6 +98,11 @@ async function fetchLiveRedditPosts(): Promise<Gig[]> {
       const { category, label } = detectCategory(`${title} ${text}`);
       const { budget, budgetNumeric } = extractBudget(`${title} ${text}`);
 
+      // Ensure exact, direct Reddit discussion thread URL
+      const exactPostUrl = data.permalink 
+        ? `https://www.reddit.com${data.permalink}` 
+        : `https://www.reddit.com/r/forhire/comments/${data.id}/`;
+
       liveGigs.push({
         id: `reddit-${data.id}`,
         title: title.replace(/^\[hiring\]\s*/i, ''),
@@ -109,8 +116,8 @@ async function fetchLiveRedditPosts(): Promise<Gig[]> {
         budgetNumeric,
         budgetType: budget.includes('/hr') ? 'hourly' : 'fixed',
         postedMinutesAgo: minutesAgo,
-        originalUrl: `https://reddit.com${data.url}`,
-        dmUrl: `https://reddit.com/message/compose/?to=${data.author}&subject=${encodeURIComponent(title.slice(0, 50))}`,
+        originalUrl: exactPostUrl,
+        dmUrl: `https://www.reddit.com/message/compose/?to=${data.author}&subject=${encodeURIComponent(title.slice(0, 50))}`,
         isVerifiedClient: true,
         requiredSkills: [label.split(' ')[0], 'Remote Communication'],
         isLockedForFree: minutesAgo < 120,
