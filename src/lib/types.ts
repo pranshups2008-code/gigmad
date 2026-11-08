@@ -35,8 +35,9 @@ export interface Gig {
   authorAvatar?: string;
   budget: string;
   budgetNumeric: number; // for range filtering
-  budgetType: 'fixed' | 'monthly' | 'hourly';
+  budgetType: 'fixed' | 'monthly' | 'hourly' | 'unknown';
   postedMinutesAgo: number;
+  postedAt?: string;
   originalUrl: string;
   dmUrl: string;
   isVerifiedClient: boolean;

@@ -5,7 +5,6 @@ import {
   Sparkles, 
   CheckCircle2, 
   AlertTriangle, 
-  ArrowRight, 
   Copy, 
   Check, 
   TrendingUp, 
@@ -19,6 +18,7 @@ export const PitchGraderSection: React.FC = () => {
   const [targetRole, setTargetRole] = useState('Full-Stack React Developer');
   const [isGrading, setIsGrading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
   const [result, setResult] = useState<{
     score: number;
     rating: string;
@@ -32,29 +32,30 @@ export const PitchGraderSection: React.FC = () => {
 
   const handleGrade = async () => {
     if (!pitchText.trim()) return;
-    setIsGrading(true);
+    setIsGrading(true); setError(''); setResult(null);
 
     try {
-      const res = await fetch('/api/grade-pitch', {
+      const res = await fetch('/api/services/grade-pitch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pitchText, targetRole }),
       });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Unable to review your pitch.');
       if (res.ok) {
         setResult(data);
         SoundRadar.playSuccessChime();
       }
-    } catch {
-      // Error handling
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Unable to review your pitch.');
     } finally {
       setIsGrading(false);
     }
   };
 
-  const handleCopyRewrite = () => {
+  const handleCopyRewrite = async () => {
     if (!result?.optimizedRewrite) return;
-    navigator.clipboard.writeText(result.optimizedRewrite);
+    try { await navigator.clipboard.writeText(result.optimizedRewrite); } catch { setError('Unable to copy. Select and copy the text manually.'); return; }
     setCopied(true);
     SoundRadar.playSuccessChime();
     setTimeout(() => setCopied(false), 2000);
@@ -72,13 +73,13 @@ export const PitchGraderSection: React.FC = () => {
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono">
             <Target className="w-3.5 h-3.5" />
-            <span>Free Viral Tool • 100% Free Forever</span>
+            <span>AI writing feedback • Account required</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             AI Pitch & DM <span className="text-emerald-400">Conversion Grader</span>
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400 max-w-xl mx-auto">
-            Test your cold pitch before sending it to a founder. Our AI simulates real founder reading habits and gives you a score with instant fixes.
+            Test your cold pitch before sending it to a founder. AI reviews clarity, evidence, and next steps. Scores are subjective writing feedback, not a prediction of client responses. Log in from the dashboard first.
           </p>
         </div>
 
@@ -98,6 +99,7 @@ export const PitchGraderSection: React.FC = () => {
               </button>
             </div>
 
+            {error && <p role="alert" className="text-sm text-amber-300">{error} <a href="/dashboard" className="underline">Open dashboard</a></p>}
             <textarea
               rows={6}
               value={pitchText}

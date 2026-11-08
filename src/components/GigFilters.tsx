@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, Filter, ShieldCheck } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { GigCategory, GigSource } from '@/lib/types';
 
 interface GigFiltersProps {
@@ -11,8 +11,6 @@ interface GigFiltersProps {
   onSelectSource: (src: GigSource | 'all') => void;
   minBudget: number;
   onSelectMinBudget: (budget: number) => void;
-  verifiedOnly: boolean;
-  onToggleVerifiedOnly: () => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
 }
@@ -35,8 +33,6 @@ export const GigFilters: React.FC<GigFiltersProps> = ({
   onSelectSource,
   minBudget,
   onSelectMinBudget,
-  verifiedOnly,
-  onToggleVerifiedOnly,
   searchQuery,
   onSearchChange,
 }) => {
@@ -61,7 +57,7 @@ export const GigFilters: React.FC<GigFiltersProps> = ({
         <div className="flex items-center gap-1.5 self-start sm:self-auto overflow-x-auto pb-1 sm:pb-0">
           <span className="text-xs text-zinc-400 font-mono flex items-center gap-1 mr-1">
             <Filter className="w-3.5 h-3.5 text-zinc-500" />
-            Min Budget:
+            Min stated $:
           </span>
           {[0, 1000, 2500, 4000].map((amount) => (
             <button
@@ -78,18 +74,7 @@ export const GigFilters: React.FC<GigFiltersProps> = ({
           ))}
         </div>
 
-        {/* Verified poster toggle */}
-        <button
-          onClick={onToggleVerifiedOnly}
-          className={`px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all border ${
-            verifiedOnly
-              ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400'
-              : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-zinc-200'
-          }`}
-        >
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Verified Clients Only</span>
-        </button>
+        <span className="text-xs text-zinc-500">Posters are not independently verified.</span>
 
       </div>
 
@@ -113,7 +98,7 @@ export const GigFilters: React.FC<GigFiltersProps> = ({
       {/* Source pills */}
       <div className="flex items-center gap-2 pt-1 border-t border-zinc-800/60 text-xs">
         <span className="text-zinc-400 font-mono text-[11px]">Radar Source:</span>
-        {(['all', 'twitter', 'reddit', 'hackernews', 'discord'] as const).map((src) => (
+        {(['all', 'reddit'] as const).map((src) => (
           <button
             key={src}
             onClick={() => onSelectSource(src)}
@@ -123,7 +108,7 @@ export const GigFilters: React.FC<GigFiltersProps> = ({
                 : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            {src === 'twitter' ? '𝕏 Twitter' : src}
+            {src}
           </button>
         ))}
       </div>

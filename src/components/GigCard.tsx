@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Sparkles, 
   Send, 
@@ -30,6 +30,9 @@ export const GigCard: React.FC<GigCardProps> = ({
   onOpenPitch,
   onOpenUpgrade,
 }) => {
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(timer); }, []);
+  const minutesAgo = gig.postedAt ? Math.max(0, Math.floor((now - Date.parse(gig.postedAt)) / 60000)) : gig.postedMinutesAgo;
   const isBlurred = userTier === 'free' && gig.isLockedForFree;
 
   const getSourceBadge = (source: Gig['source']) => {
@@ -69,7 +72,7 @@ export const GigCard: React.FC<GigCardProps> = ({
         <div className="flex items-center gap-2">
           {getSourceBadge(gig.source)}
           <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-zinc-800/80 text-zinc-300">
-            {gig.categoryLabel}
+            {gig.categoryLabel} (inferred)
           </span>
           {gig.isVerifiedClient && (
             <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400">
@@ -87,7 +90,7 @@ export const GigCard: React.FC<GigCardProps> = ({
 
           <span className="inline-flex items-center gap-1 text-[11px] font-mono text-zinc-400">
             <Clock className="w-3 h-3 text-zinc-500" />
-            {gig.postedMinutesAgo === 0 ? 'Just now' : `${gig.postedMinutesAgo}m ago`}
+            {minutesAgo === 0 ? 'Just now' : `${minutesAgo}m ago`}
           </span>
 
           <button
@@ -161,7 +164,7 @@ export const GigCard: React.FC<GigCardProps> = ({
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition-all hover:scale-[1.02]"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              1-Click AI Pitch
+              Draft AI pitch
             </button>
 
             <a
@@ -182,7 +185,7 @@ export const GigCard: React.FC<GigCardProps> = ({
             className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 text-xs font-bold shadow-md shadow-emerald-500/20 transition-all hover:scale-[1.02]"
           >
             <Send className="w-3.5 h-3.5" />
-            DM Client Directly
+            Message author
           </a>
         </div>
       )}
